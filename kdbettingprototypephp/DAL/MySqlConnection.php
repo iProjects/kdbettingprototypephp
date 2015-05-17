@@ -9,7 +9,7 @@
 //header('Location: kdLogin.php');
 //}
 // DB connection info
-$host = "localhost:3306";
+$host = "localhost";
 $port = "3306";
 $user = "root";
 $pwd = "Pass12345";
