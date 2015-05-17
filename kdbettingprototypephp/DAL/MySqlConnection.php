@@ -1,7 +1,7 @@
 
 <?php
 
-session_start();
+//session_start();
 //if you are not logged in redirect to login page.
 //if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true")
 //{ 
