@@ -5,10 +5,10 @@ session_start();
 if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true"  || !(isset($_SESSION['loggedinuser'])))
 { 
 // remove session variables 
-unset($_SESSION["logincookie"]);
-unset($_SESSION["loggedinuser"]);
-$_SESSION['redirect'] = "kdGames.php";
-header('Location: kdLogin.php');
+//unset($_SESSION["logincookie"]);
+//unset($_SESSION["loggedinuser"]);
+//$_SESSION['redirect'] = "kdGames.php";
+//header('Location: kdLogin.php');
 }
   
 ?>
