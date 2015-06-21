@@ -1,55 +1,43 @@
-
 <?php
 
-//session_start();
-//if you are not logged in redirect to login page.
-//if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true")
-//{ 
-//$_SESSION['logincookie'] = "false";
-//header('Location: kdLogin.php');
-//}
-// DB connection info
+//$host = "192.168.0.101";
 $host = "localhost";
 $port = "3306";
-$user = "root";
-$pwd = "Pass12345";
 $db = "kdbettingdb";
-//
-//try 
-//{
-//$conn = new PDO( "mysql:host=$host; Database = $db ", $user, $pwd);
-//if (!$conn) {
-//    die(var_dump('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error())); 
-//}else{
-//    $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION,PDO::ATTR_CASE, PDO::CASE_NATURAL );
-//   //echo('Connection established host= [' . $host . '] ' . $pwd);   
-//   $sql_select = "SELECT * FROM kdbets ORDER BY Id ASC"; 
-//   echo($sql_select);
-//$search_result = mysql_query($sql_select, $conn);
-//echo($search_result);
-//}
-//
-//}
-//catch(Exception $e) 
-//{
-//die(var_dump($e));
-//}
-
+$user = "sa";
+$pwd = "sa";
+$msg = "";
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pwd);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $stmt = $conn->prepare("SELECT * FROM kdbets ORDER BY Id ASC");
-    $stmt->execute();
 
-    // set the resulting array to associative
-    $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-    foreach (new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k => $v) {
-        echo $v->Description;
+    $conn = new PDO("mysql:host=$host;port=$port;dbname=$db", $user, $pwd);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    if ($conn) {
+        return $conn;
+    } else {
+        $msg = "connection failed...</br/>";
+        $msg .= error_get_last();
+        echo($msg);
+        return $msg;
     }
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+} catch (Exception $e) {
+    $errormsg .= $e->getMessage();
+    if ($e->getTraceAsString() != NULL) {
+        $errormsg .= "<br/>" . $e->getTraceAsString();
+    }
+
+    if (error_get_last() != NULL) {
+        $errormsg .= "<br/>" . error_get_last();
+    }
+
+    $errormsg .= '<br/><input type="button" value="Back" onclick="window.history.go(-1); return false;" />';
+
+    echo $errormsg;
 }
-$conn = null;
+
+function CloseConnection() {
+    $conn = null;
+}
+
 ?>
- 

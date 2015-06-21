@@ -1,34 +1,41 @@
-
 <?php
 
-session_start(); 
-
-//if you are not logged in redirect to login page.
-if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true")
-{ 
-$_SESSION['logincookie'] = "false";
-header('Location: kdLogin.php');
-}
-  
-// DB connection info
 $host = "sbserver-pc\sqlexpress";
+$db = "kdbettingdb";
 $user = "sa";
 $pwd = "sa";
-$db = "kdbettingdb";
+$msg = "";
 
-try 
-{
-$conn = new PDO( "sqlsrv:Server= $host ; Database = $db ", $user, $pwd);
-if (!$conn) {
-    die(var_dump('Connect Error (' . mysqli_connect_errno() . ') '
-           . mysqli_connect_error())); 
+try {
+
+    $conn = new PDO("sqlsrv:Server=$host;Database =$db", $user, $pwd);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    if ($conn) {
+        return $conn;
+    } else {
+        $msg = "connection failed...</br/>";
+        $msg .= error_get_last();
+        echo($msg);
+        return $msg;
+    }
+} catch (Exception $e) {
+    $errormsg .= $e->getMessage();
+    if ($e->getTraceAsString() != NULL) {
+        $errormsg .= "<br/>" . $e->getTraceAsString();
+    }
+
+    if (error_get_last() != NULL) {
+        $errormsg .= "<br/>" . error_get_last();
+    }
+
+    $errormsg .= '<br/><input type="button" value="Back" onclick="window.history.go(-1); return false;" />';
+
+    echo $errormsg;
 }
-$conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION,PDO::ATTR_CASE, PDO::CASE_NATURAL );
-}
-catch(Exception $e) 
-{
-die(var_dump($e));
+
+function CloseConnection() {
+    $conn = null;
 }
 
 ?>
- 

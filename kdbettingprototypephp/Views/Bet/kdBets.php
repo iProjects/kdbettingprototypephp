@@ -1,27 +1,29 @@
 
 <?php
 // DB connection info
-//$host = "sapserver\sqlexpress";
+//$host = "localhost";
 //$user = "sa";
-//$pwd = "sa";
+//$pwd = "";
 //$db = "kdbettingdb";
 
+$host = "localhost";
+$port = 3306;
+$socket = "";
+$user = "root";
+$password = "";
+$dbname = "kdbettingdb";
 
-try {
-//$conn = new PDO( "sqlsrv:Server= $host ; Database = $db ", $user, $pwd);
-//$conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-    require('../DAL/MySqlConnection.php');
-//echo($conn); 
-//echo($user); 
-    echo($db);
-//read data
-    $sql_select = "SELECT * FROM kdbets ORDER BY Id ASC";
-//$stmt = $conn->query($sql_select);
-//$games = $stmt->fetchAll();
-    $search_result = mysql_query($sql_select, $conn);
-    echo($search_result);
+error_log("calling conn...", 3, "../logs/error_log.log");
+$con = new mysql($host, $user, $password, $dbname, $port, $socket)
+        or die('Could not connect to the database server' . mysqli_connect_error());
+error_log("connected to the database server", 3, "../logs/error_log.log");
+$query = "SELECT * FROM kdbets";
 
-    if (count($games) > 0) {
+if ($stmt = $con->prepare($query)) {
+    $stmt->execute();
+    $stmt->bind_result($field1, $field2);
+
+    while ($stmt->fetch()) {
 
         echo "<table>";
         echo "<tr><th>Id</th>";
@@ -33,6 +35,8 @@ try {
         echo "<th>Status</th>";
         echo "<th>Date Created</th>";
         echo "<th>Expiry Date</th></tr>";
+
+        $games = $stmt->fetchAll();
 
         foreach ($games as $game) {
             echo "<tr><td>" . $game['Id'] . "</td>";
@@ -47,11 +51,57 @@ try {
         }
         echo "</table>";
     }
-
-    $stmt->closeCursor();
-} catch (Exception $e) {
-    die(var_dump($e));
+    $stmt->close();
 }
+
+print_r(error_get_last());
+
+//
+//    try {
+//        $conn = new PDO("sqlsrv:Server= $host ; Database = $db ", $user, $pwd);
+//        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+////    require('../DAL/MySqlConnection.php');
+////echo($conn); 
+////echo($user); 
+////    echo($db);
+////read data
+//        $sql_select = "SELECT * FROM kdbets ORDER BY Id ASC";
+////$stmt = $conn->query($sql_select);
+////$games = $stmt->fetchAll();
+//        $search_result = mysql_query($sql_select, $conn);
+//        echo($search_result);
+//
+//        if (count($games) > 0) {
+//
+//            echo "<table>";
+//            echo "<tr><th>Id</th>";
+//            echo "<th>User</th>";
+//            echo "<th>Single Bet</th>";
+//            echo "<th>Multiple Bet</th>";
+//            echo "<th>Bet Validity</th>";
+//            echo "<th>Bet Closed</th>";
+//            echo "<th>Status</th>";
+//            echo "<th>Date Created</th>";
+//            echo "<th>Expiry Date</th></tr>";
+//
+//            foreach ($games as $game) {
+//                echo "<tr><td>" . $game['Id'] . "</td>";
+//                echo "<td>" . $game['UserId'] . "</td>";
+//                echo "<td>" . $game['SingleBet'] . "</td>";
+//                echo "<td>" . $game['MultipleBet'] . "</td>";
+//                echo "<td>" . $game['BetValidity'] . "</td>";
+//                echo "<td>" . $game['BetClosed'] . "</td>";
+//                echo "<td>" . $game['Status'] . "</td>";
+//                echo "<td>" . $game['DateCreated'] . "</td>";
+//                echo "<td>" . $game['ExpiryDate'] . "</td></tr>";
+//            }
+//            echo "</table>";
+//        }
+//
+//        $stmt->closeCursor();
+//    } catch (Exception $e) {
+//        die(var_dump($e));
+//    }
 ?>
 
 <?php
@@ -124,18 +174,7 @@ if ($_POST) {
 
         <link rel="stylesheet" href="Content/Site.css" type="text/css" media="all"> 
 
-        <script type="text/javascript" src="Scripts/jquery-2.0.3.js" ></script>
-        <script type="text/javascript" src="Scripts/jquery-ui-1.8.20.js"></script>
-        <script type="text/javascript" src="Scripts/CustomScripts.js" ></script>
-        <script type="text/javascript" src="Scripts/modernizr-2.5.3.js"></script>
-        <script type="text/javascript" src="Scripts/jquery.validate.unobtrusive.js"></script>
-        <script type="text/javascript" src="Scripts/jquery.validate"></script>
-        <script type="text/javascript" src="Scripts/jquery.unobtrusive-ajax.js"></script>
-        <script type="text/javascript" src="Scripts/knockout-2.1.0.js"></script>
-        <script type="text/javascript" src="Scripts/modernizr-2.5.3.js"></script>
-        <script type="text/javascript" src="Scripts/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="Scripts/jquery.tablesorter.pager"></script>
-        <script type="text/javascript" src="Scripts/knockout-2.1.0.debug.js"></script>
+        <script type="text/javascript" src="Scripts/jquery-2.0.3.js" ></script> 
 
 
     </head>
@@ -156,27 +195,27 @@ if ($_POST) {
                 <div class="float-right">
                     <section id="login">
 
-<?php
-if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true") {
-    echo '<div  class="floatleft">
- <a id="btnSubmitRegisterForm" style="cursor: pointer;" href="kdRegister.php">Register</a>
- 
-<a id="btnSubmitLoginForm" style="cursor: pointer;" href="kdLogin.php">Login</a>
- </div>';
-} else {
-
-    if (isset($_SESSION['loggedinuser'])) {
-
-        $loggedinuser = $_SESSION['loggedinuser'];
-
-        echo '<div  class="floatleft">
-<a style="cursor: text;" > Welcome To KDBetting, ' . htmlspecialchars(strtoupper($loggedinuser)) . '</a>
-    
-<a id="btnSubmitLogOutForm" style="cursor: pointer;" href="kdLogOut.php" title="Log Off">Log Off</a>
-</div>';
-    }
-}
-?>
+                        <?php
+//                            if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true") {
+//                                echo '<div  class="floatleft">
+// <a id="btnSubmitRegisterForm" style="cursor: pointer;" href="kdRegister.php">Register</a>
+// 
+//<a id="btnSubmitLoginForm" style="cursor: pointer;" href="kdLogin.php">Login</a>
+// </div>';
+//                            } else {
+//
+//                                if (isset($_SESSION['loggedinuser'])) {
+//
+//                                    $loggedinuser = $_SESSION['loggedinuser'];
+//
+//                                    echo '<div  class="floatleft">
+//<a style="cursor: text;" > Welcome To KDBetting, ' . htmlspecialchars(strtoupper($loggedinuser)) . '</a>
+//    
+//<a id="btnSubmitLogOutForm" style="cursor: pointer;" href="kdLogOut.php" title="Log Off">Log Off</a>
+//</div>';
+//                                }
+//                            }
+                        ?>
 
                     </section>
                 </div>
@@ -465,58 +504,56 @@ if (!(isset($_SESSION['logincookie'])) || $_SESSION['logincookie'] != "true") {
 
                 <div>
 
-<?php
+                    <?php
 // DB connection info
 //$host = "sapserver\sqlexpress";
 //$user = "sa";
 //$pwd = "sa";
 //$db = "kdbettingdb";
-
-
-try {
-//$conn = new PDO( "sqlsrv:Server= $host ; Database = $db ", $user, $pwd);
-//$conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-    require('../DAL/MySqlConnection.php');
-    echo($conn);
-    echo($user);
-    echo($db);
-//read data
-    $sql_select = "SELECT * FROM kdbets ORDER BY Id ASC";
-    $stmt = $conn->query($sql_select);
-    $games = $stmt->fetchAll();
-
-    if (count($games) > 0) {
-
-        echo "<table>";
-        echo "<tr><th>Id</th>";
-        echo "<th>User</th>";
-        echo "<th>Single Bet</th>";
-        echo "<th>Multiple Bet</th>";
-        echo "<th>Bet Validity</th>";
-        echo "<th>Bet Closed</th>";
-        echo "<th>Status</th>";
-        echo "<th>Date Created</th>";
-        echo "<th>Expiry Date</th></tr>";
-
-        foreach ($games as $game) {
-            echo "<tr><td>" . $game['Id'] . "</td>";
-            echo "<td>" . $game['UserId'] . "</td>";
-            echo "<td>" . $game['SingleBet'] . "</td>";
-            echo "<td>" . $game['MultipleBet'] . "</td>";
-            echo "<td>" . $game['BetValidity'] . "</td>";
-            echo "<td>" . $game['BetClosed'] . "</td>";
-            echo "<td>" . $game['Status'] . "</td>";
-            echo "<td>" . $game['DateCreated'] . "</td>";
-            echo "<td>" . $game['ExpiryDate'] . "</td></tr>";
-        }
-        echo "</table>";
-    }
-
-    $stmt->closeCursor();
-} catch (Exception $e) {
-    die(var_dump($e));
-}
-?>
+//                        try {
+////$conn = new PDO( "sqlsrv:Server= $host ; Database = $db ", $user, $pwd);
+////$conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+//                            require('../DAL/MySqlConnection.php');
+//                            echo($conn);
+//                            echo($user);
+//                            echo($db);
+////read data
+//                            $sql_select = "SELECT * FROM kdbets ORDER BY Id ASC";
+//                            $stmt = $conn->query($sql_select);
+//                            $games = $stmt->fetchAll();
+//
+//                            if (count($games) > 0) {
+//
+//                                echo "<table>";
+//                                echo "<tr><th>Id</th>";
+//                                echo "<th>User</th>";
+//                                echo "<th>Single Bet</th>";
+//                                echo "<th>Multiple Bet</th>";
+//                                echo "<th>Bet Validity</th>";
+//                                echo "<th>Bet Closed</th>";
+//                                echo "<th>Status</th>";
+//                                echo "<th>Date Created</th>";
+//                                echo "<th>Expiry Date</th></tr>";
+//
+//                                foreach ($games as $game) {
+//                                    echo "<tr><td>" . $game['Id'] . "</td>";
+//                                    echo "<td>" . $game['UserId'] . "</td>";
+//                                    echo "<td>" . $game['SingleBet'] . "</td>";
+//                                    echo "<td>" . $game['MultipleBet'] . "</td>";
+//                                    echo "<td>" . $game['BetValidity'] . "</td>";
+//                                    echo "<td>" . $game['BetClosed'] . "</td>";
+//                                    echo "<td>" . $game['Status'] . "</td>";
+//                                    echo "<td>" . $game['DateCreated'] . "</td>";
+//                                    echo "<td>" . $game['ExpiryDate'] . "</td></tr>";
+//                                }
+//                                echo "</table>";
+//                            }
+//
+//                            $stmt->closeCursor();
+//                        } catch (Exception $e) {
+//                            die(var_dump($e));
+//                        }
+                    ?>
 
 
                 </div>
